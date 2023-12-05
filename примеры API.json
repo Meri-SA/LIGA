@@ -1,0 +1,245 @@
+//******* Внешние интеграции *************
+//Безопасность
+Топик liga-security-requests 
+{
+    "id": "идентификатор_стажера",
+    "traineeship_id": "идентификатор стажировки" "type": "intern",
+    "first_name": "имя",
+    "last_name": "фамилия",
+    "middle_name": "отчество",
+    "address": "прописка",
+    "birthday": "дата_рождения"
+}
+//Пример
+Топик liga-security-requests 
+{
+    "id": "10001",
+    "traineeship_id": "10002",
+    "type": "intern",
+    "first_name": "Василий",
+    "last_name": "Винохонян",
+    "middle_name": "Александрович",
+    "address": "г.Москва, ул. Дружбы народов, д.89, кв.189",
+    "birthday": "28.02.2008"
+}
+//Ответ
+Топик liga-security-responses 
+{
+    "id": "идентификатор_стажера",
+    "traineeship_id": "идентификатор стажировки" "status": "статус_проверки",
+    "description": "комментарий_от_СБ"
+}
+
+Топик liga-security-responses 
+{
+    "id": "10001",
+    "traineeship_id": "10002",
+    "status": "SUCCSESS",
+    "description": "Не пьет, не курит, гуляет с девушками"
+}
+
+Топик liga-security-responses 
+{
+    "id": "10001",
+    "traineeship_id": "10002",
+    "status": "FAIL",
+    "description": "Скрывается от армии"
+}
+//Регистрация в Лиге
+{
+    "username": "79000000000"
+}
+// Авторизация
+{
+    "username": "79000000000",
+    "password": "123abc"
+}
+// успешный ответ  при авторизации
+{
+    "token": "token",
+    "expires_in": 86400,
+    "token_type": "bearer"
+}
+// ответ в случает ошибки
+{
+    "error": "error_code",
+    "error_description": "Description of the error code"
+}
+//SOAP вазимодествие с HR Запрос
+  <soapenv:Envelope xmlns:soapenv=”http: //schemas.xmlsoap.org/soap/envelope/”
+xmlns:loc=”http: //localhost/”>
+  <soapenv:Header/>
+  <soapenv:Body>
+    <loc:putEmployeesRequest>
+    <!—1 or more repetitions:
+      <loc:employee>
+        <loc:firstName>?</loc:firstName>
+        <loc:lastName>?</loc:lastName>
+        <loc:middleName>?</loc:middleName>
+        <loc:phone_number>?</loc:phone_number>
+        <loc:email>?</loc:email>
+        <loc: irthdate>?</loc: irthdate>
+        <loc:city>?</loc:city>
+      </loc:employee>
+    </loc:putEmployeesRequest>
+  </soapenv:Body>
+</soapenv:Envelope>
+
+//Ответ
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+xmlns:tns="http://localhost/">
+  <soap:Body>
+    <putEmployeesResponse xmlns="http://localhost/">
+      <status>SUCCESS</status>
+    </putEmployeesResponse>
+
+
+//******* Внутренние интеграции *************
+// Создание лекции
+request
+https: //liga-server/schedule/createSchedule
+type:post
+
+{
+    nameSeminar: "Название лекции"
+    topicSeminar: "Тема лекции"
+    linkPresentation: "https://dfdfdfdfd"
+    linkSeminar: "https://dfdfdfdfd"
+    linkRecordSeminar: "https://dfdfdfdfd"
+    dataSeminar: dd-mm-yyyy hh:MM:ss.ms+gtm
+    idInternship: idInternship
+}
+
+response  успешно
+{
+    status: "succsess"
+    idSeminar: idSeminar
+}
+
+response не успешно
+{
+    status: "fail"
+    description: "Дата семинара прошла"
+}
+// Получить расписание
+request
+https: //liga-server/schedule/getSchedule?username='userName'
+type:get
+
+response успешно
+{
+    status: "succsess"
+     [
+        seminars: {
+                dateTime: "dd-mm-yyyy hh:MM +3G",
+                seminarName: "Название лекции"
+                topic: "Тема лекции"
+        }
+    ]
+}
+
+response не успешно
+{
+    status: "fail"
+    description: "Участник процесса обучения не найден"
+}
+// Создание группы
+request
+https: //liga-server/Group/createGroup
+type:post
+
+{
+    groupName: "Группа 6"
+}
+response  успешно
+{
+    status: "succsess"
+    idGroup:“1005050”
+}
+// добавление сотрудников в группу
+request
+https: //liga-server/internshipParticipants/addParticipants'
+type:post
+{
+    idGroup:idGroup
+    id:id
+}
+// Успешный ответ
+{
+    status: "succsess"
+     [
+        addParticipants: {
+                    groupName: "Группа1",
+                    firstName: "Ирина",
+                    lastName: "Бирюкова"
+                    middleName: "Владимировна"
+        }
+    ]
+}
+// Присвоение ролей сотрудникам
+request
+https: //liga-server/internshipParticipants/setRoleParticipants'
+type:post
+{
+    id:id
+    idGroup:idGroup
+    idRole:idRole
+}
+//ответ успешный
+{
+        status: "succsess"
+}
+// не успешный ответ
+{
+        status: "fail"
+        descripton: "id содтрудника не найдено"
+}
+// Удаление сотрудника из группы
+request
+https: //liga-server/internshipParticipants/delete'
+type:post
+{
+    id:id
+    idGroup:idGroup
+}
+//ответ успешный
+{
+        status: "succsess"
+}
+// не успешный ответ
+{
+        status: "fail"
+        descripton: "id содтрудника не найдено"
+}
+// Перевод сотрудника в другую группу
+request
+https: //liga-server/internshipParticipants/move'
+type:post
+{
+    idGroup:idGroup
+    id:id
+    idNewGroup:idGroup
+}
+//ответ успешный
+{
+        status: "succsess"
+}
+// не успешный ответ
+{
+        status: "fail"
+        descripton: "id содтрудника не найдено"
+}
+// Получить данные успеваемости стажера
+request
+https: //liga-server/Grade/getGrade?id='id'
+type:get
+{
+    status: "succsess"
+     [
+        grade: {
+                rate: "10",
+                commentHomework: "Обратить внимание на …"
+                comment: "Общие результат стажировки …"
+        }
+    ]
+}
