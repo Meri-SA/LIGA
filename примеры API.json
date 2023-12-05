@@ -45,11 +45,16 @@
     "status": "FAIL",
     "description": "Скрывается от армии"
 }
+ 
+
+// Метод Post/api/registration 
 //Регистрация в Лиге
 {
     "username": "79000000000"
 }
+// Метод Post/api/auth 
 // Авторизация
+
 {
     "username": "79000000000",
     "password": "123abc"
@@ -158,7 +163,7 @@ response  успешно
 }
 // добавление сотрудников в группу
 request
-https: //liga-server/internshipParticipants/addParticipants'
+https: //liga-server/internshipParticipants/addParticipants
 type:post
 {
     idGroup:idGroup
@@ -229,6 +234,7 @@ type:post
         status: "fail"
         descripton: "id содтрудника не найдено"
 }
+
 // Получить данные успеваемости стажера
 request
 https: //liga-server/Grade/getGrade?id='id'
