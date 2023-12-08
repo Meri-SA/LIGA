@@ -1,0 +1,190 @@
+openapi: 3.0.3
+info:
+  title: Лига
+  description: >-
+    Описание интеграций для взаимодействия с HR
+  termsOfService: http://swagger.io/terms/
+  contact:
+    email: apiteam@swagger.io
+  version: 1.0.0
+externalDocs:
+  description: Find out more about Swagger
+  url: http://swagger.io
+servers:
+  - url: https://liga-server.ru/api/v1
+tags:
+  - name: Интеграция с HR
+    description: интеграция c отделом кадров
+    externalDocs:
+      description: Find out more
+      url: http://swagger.io
+paths:
+# Уточнить как правильно написать название
+ /studentlistbyiddirector:
+
+    post:
+      tags:
+        - Студенты
+      summary: Получаем список студентов курируемых руководителем
+      description: Получаем список студентов курируемых руководителем
+    
+      requestBody:
+        description: Получение списка студентов по id руководиеля
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/studentlistbyiddirector'
+        required: true
+      responses:
+        '200':
+          description: Успешная операция
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/studentlistbyiddirectorSuccess'
+        'default':
+          description: Произошла ошибка
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/error'
+                  
+                  
+ /gradestudent/{id}:
+    get:
+      tags:
+        - Студенты
+      summary: Получаем успеваемость студента
+      description: Получаем успеваемость студента
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: id сотрудника
+          example: 99
+          schema:
+            type: string
+          
+      responses:
+        '200':
+          description: Успешная операция
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/commentmentor'
+                  
+        'default':
+          description: Произошла ошибка
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/error'        
+components:
+  schemas:
+    commentmentor:
+      type: object
+      properties:
+        comment:
+          type: string
+          example: нужно  брать
+        
+        gradestudents:
+          type: array
+          items:
+              $ref: '#/components/schemas/gradestudent' 
+            
+        
+  
+    gradestudent:
+      type: object
+      properties:
+        rate: 
+          type: integer
+          example: 5
+        commentHomework:
+          type: string
+          example: идеально сделанная работа
+
+  
+    error:
+     type: object
+     properties:
+        errorcode:
+          type: integer
+          example: 13
+        description: 
+          type: string
+          example: заело хрустальный шар
+      
+  
+    studentlistbyiddirector:
+     type: object
+     properties:
+        id:
+          type: integer
+          example: 100089
+      
+    studentlistbyiddirectorSuccess:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 100010
+        lastname: 
+          type: string
+          example: Козлова
+        firstname: 
+          type: string
+          example: Изольда
+        midlename: 
+          type: string
+          example: Тихоновна
+        groupName:
+          type: string
+          example: группа 10
+          
+          
+    
+    ActiveDirectoryRegistrationSuccess:
+      type: object
+      properties:
+        status: 
+          type: string
+          example: OK
+          
+    ActiveDirectoryAuth:
+      type: object
+      properties:
+        username: 
+          type: string
+          example: 79000000000
+        password:
+          type: string
+          example: JohnSuperman
+    
+    ActiveDirectoryAuthSuccess:
+      type: object
+      properties:
+        token: 
+          type: string
+          example: lsj;lfknoie8323n#
+        expires_in:
+          type: string
+          example: 22-01-2023 9:34:44
+        token_type:
+          type: string
+          example : bearer
+
+    ActiveDirectoryAuthFail:
+      type: object
+      properties:
+        error: 
+          type: string
+          example: 34
+        error_description:
+          type: string
+          example: Ошибка в синтаксисе запроса, из-за которой сервер не может его обработать
+
+  
