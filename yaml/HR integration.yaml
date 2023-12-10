@@ -1,0 +1,309 @@
+openapi: 3.0.3
+info:
+  title: Лига
+  description: >-
+    Описание интеграций для взаимодействия с HR
+  termsOfService: http://swagger.io/terms/
+  contact:
+    email: apiteam@swagger.io
+  version: 1.0.0
+externalDocs:
+  description: Find out more about Swagger
+  url: http://swagger.io
+servers:
+  - url: https://liga-server.ru/api/v1
+tags:
+  - name: Интеграция с HR
+    description: интеграция c отделом кадров
+    externalDocs:
+      description: Find out more
+      url: http://swagger.io
+paths:
+  
+ /putEmployeesRequest:
+    put:
+      tags:
+        - HR
+      summary: Интеграция с HR через SOAP
+      description: позволяет передать информацию о стажере, которорый бедт принят на работу
+      requestBody:
+        description: SOAP взаимодействие
+        content:
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/Envelope'
+        required: true
+      responses:
+        '200':
+          description: Успешная операция
+        
+          content:
+            application/xml:
+              schema:
+              
+                $ref: '#/components/schemas/Envelope_'
+ /successdecision:
+    post:
+      tags:
+        - HR
+      summary: отправляем id стажера на трудоустройство
+      description: по результатом успешно пройденой стажировки производится найм
+    
+      requestBody:
+        description: отправление id стажера HR
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/decision'
+        required: true
+      responses:
+        '200':
+          description: Успешная операция
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/decisionok'
+        'default':
+          description: Произошла ошибка
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/error'
+ 
+ /sutdentslist/{id},{id_role}:
+
+   get:
+      tags:
+        - Студенты
+      summary: Получаем список студентов  курируемых руководителем
+      description: Позволяет получить список студенов отобраных по id руководителя и роли для демонстрации на экране принятия решении о найме
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: id сотрудника
+          example: 000099
+          schema:
+            type: string
+        - name: id_role
+          in: path
+          required: true
+          description: id роли
+          example: 0000012
+          schema:
+            type: string
+            
+      responses:
+        '200':
+          description: Успешная операция
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/studentlistbyiddirectorsuccess'
+        'default':
+          description: Произошла ошибка
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/error'
+                
+ /gradestudent/{id}:
+    get:
+      tags:
+        - Студенты
+      summary: Получаем успеваемость студента
+      description: Для оценки успеваемости студента и просмотра результирующего комментария по каждому стажеру
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: id сотрудника
+          example: 900009
+          schema:
+            type: string
+          
+      responses:
+        '200':
+          description: Успешная операция
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/commentmentor'
+                  
+        'default':
+          description: Произошла ошибка
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/error'        
+components: 
+  schemas:
+    Envelope_ :
+        xml:
+          namespace: http://schemas.xmlsoap.org/soap/envelope/
+          prefix: soap
+          name: Envelope
+          wrapped: true
+        properties:
+          Body:
+           $ref: '#/components/schemas/soapResponseBody'
+
+    soapResponseBody:
+      type: object
+      xml:  
+        prefix: soap
+      properties:
+        putEmployeesResponse:
+          xml:
+            namespace: http://localhost/
+          type: string
+          example: SUCESS
+
+
+    Envelope:
+      type: object
+      xml:
+        prefix: soapenv
+        namespace: http://schemas.xmlsoap.org/soap/envelope/
+        wrapped: true
+        
+      properties:
+        Header:
+          type: object
+          example:  
+          xml:
+            prefix: soapenv
+            wrapped: true
+        Body: 
+          $ref: '#/components/schemas/putEmployeesRequest'
+    
+    putEmployeesRequest:
+      type: object
+      xml:
+        prefix: soapenv
+        wrapped: true
+
+      properties:
+        putEmployeesRequest:
+          $ref: '#/components/schemas/Employee'
+    
+    Employee:
+      type: object
+      xml:
+        prefix: loc
+        wrapped: true
+      properties:
+        employee:
+          $ref: '#/components/schemas/EmployeeDetail'
+  
+    EmployeeDetail:
+      type: object
+      xml:
+        prefix: loc
+      properties:
+        firstName:
+          type: string
+          example: Изольда
+          xml:
+            prefix: loc
+        lastName: 
+          type : string
+          example: Козлова
+          xml:
+            prefix: loc
+        middleName:
+          type: string
+          example: Тихоновна
+          xml:
+            prefix: loc
+        phone_number:
+          type: string
+          example: +7 903 787 84 93
+          xml:
+            prefix: loc
+        email:
+          type: string
+          example: Isolda.Kozlova@yandex.ru
+          xml:
+            prefix: loc
+        birthdate:
+          xml:
+            prefix: loc        
+          type: string
+          example: 01-01-1998  
+
+
+
+
+
+    decisionok:
+      type: object
+      properties:
+       decision: 
+          type: string
+          example: ok
+
+    decision:
+      type: object
+      properties:
+        id: 
+          type: integer
+          example: 188888
+               
+    commentmentor:
+      type: object
+      properties:
+        comment:
+          type: string
+          example: нужно  брать
+        
+        gradestudents:
+          type: array
+          items:
+              $ref: '#/components/schemas/gradestudent' 
+            
+        
+  
+    gradestudent:
+      type: object
+      properties:
+        rate: 
+          type: integer
+          example: 5
+        commentHomework:
+          type: string
+          example: идеально сделанная работа
+
+  
+    error:
+     type: object
+     properties:
+        errorcode:
+          type: integer
+          example: 13
+        description: 
+          type: string
+          example: заело хрустальный шар
+      
+    studentlistbyiddirectorsuccess:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 100010
+        lastname: 
+          type: string
+          example: Козлова
+        firstname: 
+          type: string
+          example: Изольда
+        midlename: 
+          type: string
+          example: Тихоновна
+        groupName:
+          type: string
+          example: группа 10
+  
+    
