@@ -19,22 +19,80 @@ tags:
       description: Find out more
       url: http://swagger.io
 paths:
-# Уточнить как правильно написать название
- /studentlistbyiddirector:
-
+  
+ /putEmployeesRequest:
+    put:
+      tags:
+        - HR
+      summary: Интеграция с HR через SOAP
+      description: позволяет передать информацию о стажере, которорый бедт принят на работу
+      requestBody:
+        description: SOAP взаимодействие
+        content:
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/Envelope'
+        required: true
+      responses:
+        '200':
+          description: Успешная операция
+        
+          content:
+            application/xml:
+              schema:
+              
+                $ref: '#/components/schemas/Envelope_'
+ /successdecision:
     post:
       tags:
-        - Студенты
-      summary: Получаем список студентов курируемых руководителем
-      description: Получаем список студентов курируемых руководителем
+        - HR
+      summary: отправляем id стажера на трудоустройство
+      description: по результатом успешно пройденой стажировки производится найм
     
       requestBody:
-        description: Получение списка студентов по id руководиеля
+        description: отправление id стажера HR
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/studentlistbyiddirector'
+              $ref: '#/components/schemas/decision'
         required: true
+      responses:
+        '200':
+          description: Успешная операция
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/decisionok'
+        'default':
+          description: Произошла ошибка
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/error'
+ 
+ /sutdentslist/{id},{id_role}:
+
+   get:
+      tags:
+        - Студенты
+      summary: Получаем список студентов  курируемых руководителем
+      description: Позволяет получить список студенов отобраных по id руководителя и роли для демонстрации на экране принятия решении о найме
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: id сотрудника
+          example: 000099
+          schema:
+            type: string
+        - name: id_role
+          in: path
+          required: true
+          description: id роли
+          example: 0000012
+          schema:
+            type: string
+            
       responses:
         '200':
           description: Успешная операция
@@ -43,27 +101,26 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/studentlistbyiddirectorSuccess'
+                  $ref: '#/components/schemas/studentlistbyiddirectorsuccess'
         'default':
           description: Произошла ошибка
           content:
             application/json:
               schema:
                   $ref: '#/components/schemas/error'
-                  
-                  
+                
  /gradestudent/{id}:
     get:
       tags:
         - Студенты
       summary: Получаем успеваемость студента
-      description: Получаем успеваемость студента
+      description: Для оценки успеваемости студента и просмотра результирующего комментария по каждому стажеру
       parameters:
         - name: id
           in: path
           required: true
           description: id сотрудника
-          example: 99
+          example: 900009
           schema:
             type: string
           
@@ -81,8 +138,120 @@ paths:
             application/json:
               schema:
                   $ref: '#/components/schemas/error'        
-components:
+components: 
   schemas:
+    Envelope_ :
+        xml:
+          namespace: http://schemas.xmlsoap.org/soap/envelope/
+          prefix: soap
+          name: Envelope
+          wrapped: true
+        properties:
+          Body:
+           $ref: '#/components/schemas/soapResponseBody'
+
+    soapResponseBody:
+      type: object
+      xml:  
+        prefix: soap
+      properties:
+        putEmployeesResponse:
+          xml:
+            namespace: http://localhost/
+          type: string
+          example: SUCESS
+
+
+    Envelope:
+      type: object
+      xml:
+        prefix: soapenv
+        namespace: http://schemas.xmlsoap.org/soap/envelope/
+        wrapped: true
+        
+      properties:
+        Header:
+          type: object
+          example:  
+          xml:
+            prefix: soapenv
+            wrapped: true
+        Body: 
+          $ref: '#/components/schemas/putEmployeesRequest'
+    
+    putEmployeesRequest:
+      type: object
+      xml:
+        prefix: soapenv
+        wrapped: true
+
+      properties:
+        putEmployeesRequest:
+          $ref: '#/components/schemas/Employee'
+    
+    Employee:
+      type: object
+      xml:
+        prefix: loc
+        wrapped: true
+      properties:
+        employee:
+          $ref: '#/components/schemas/EmployeeDetail'
+  
+    EmployeeDetail:
+      type: object
+      xml:
+        prefix: loc
+      properties:
+        firstName:
+          type: string
+          example: Изольда
+          xml:
+            prefix: loc
+        lastName: 
+          type : string
+          example: Козлова
+          xml:
+            prefix: loc
+        middleName:
+          type: string
+          example: Тихоновна
+          xml:
+            prefix: loc
+        phone_number:
+          type: string
+          example: +7 903 787 84 93
+          xml:
+            prefix: loc
+        email:
+          type: string
+          example: Isolda.Kozlova@yandex.ru
+          xml:
+            prefix: loc
+        birthdate:
+          xml:
+            prefix: loc        
+          type: string
+          example: 01-01-1998  
+
+
+
+
+
+    decisionok:
+      type: object
+      properties:
+       decision: 
+          type: string
+          example: ok
+
+    decision:
+      type: object
+      properties:
+        id: 
+          type: integer
+          example: 188888
+               
     commentmentor:
       type: object
       properties:
@@ -118,15 +287,7 @@ components:
           type: string
           example: заело хрустальный шар
       
-  
-    studentlistbyiddirector:
-     type: object
-     properties:
-        id:
-          type: integer
-          example: 100089
-      
-    studentlistbyiddirectorSuccess:
+    studentlistbyiddirectorsuccess:
       type: object
       properties:
         id:
@@ -144,47 +305,5 @@ components:
         groupName:
           type: string
           example: группа 10
-          
-          
-    
-    ActiveDirectoryRegistrationSuccess:
-      type: object
-      properties:
-        status: 
-          type: string
-          example: OK
-          
-    ActiveDirectoryAuth:
-      type: object
-      properties:
-        username: 
-          type: string
-          example: 79000000000
-        password:
-          type: string
-          example: JohnSuperman
-    
-    ActiveDirectoryAuthSuccess:
-      type: object
-      properties:
-        token: 
-          type: string
-          example: lsj;lfknoie8323n#
-        expires_in:
-          type: string
-          example: 22-01-2023 9:34:44
-        token_type:
-          type: string
-          example : bearer
-
-    ActiveDirectoryAuthFail:
-      type: object
-      properties:
-        error: 
-          type: string
-          example: 34
-        error_description:
-          type: string
-          example: Ошибка в синтаксисе запроса, из-за которой сервер не может его обработать
-
   
+    
